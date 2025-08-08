@@ -1,0 +1,165 @@
+/*  ボックス共通設定  */
+input, textarea, select,
+.pink, .pink-medium, .pink-short, .station1,
+.medium, .short, .tiny {
+  vertical-align: middle;
+  padding: 4px 6px;
+  height: 32px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* ピンク背景共通化 */
+.pink,
+.pink-medium,
+.pink-short,
+.station1 {
+  background-color: #ffe8e8;
+}
+
+/* 白い背景に変更された場合です */
+.pink.filled,
+.pink-medium.filled,
+.pink-short.filled,
+.station1.filled {
+  background-color: #fff !important;
+}
+.pink.filled *,
+.sect-header.filled label {
+  background-color: transparent !important;
+}
+
+.industry-wrap.filled {
+  background-color: #eeeeee !important;
+}
+
+.sect-header {
+  background-color: #f88;
+  font-weight: bold;
+  padding: 8px 12px;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.sect-header.filled {
+  background-color: #eeeeee !important;
+}
+
+/* 入力ボックス幅*/
+.pink-short, .short {
+  width: 60px;
+}
+.pink-medium, .medium {
+  width: 90px;
+}
+.tiny {
+  width: 50px;
+}
+.station1, .station {
+  width: 180px;
+}
+.medium {
+  width: 100px;
+}
+.long {
+  width: 200px;
+}
+.max {
+  width: 100%;
+}
+
+/* テーブル構造 */
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.detail-table th, .detail-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-table th {
+  background-color: #f5f5f5;
+  text-align: center;
+  font-weight: bold;
+  width: 20%;
+}
+.detail-table td {
+  width: 80%;
+}
+
+/* その他要素  */
+.detail-container {
+  max-width: 1000px;
+  min-width: 950px;
+  margin: 20px auto;
+  font-family: "Noto Sans JP", sans-serif;
+  z-index: 1;
+}
+.hypen {
+  margin: 0 6px;
+  display: inline-block;
+}
+.detail-font {
+  color: red;
+  font-size: 12px;
+}
+.more-indent, .indent {
+  padding-left: 20px;
+}
+.selectBox {
+  margin-left: 5%;
+  width: 60px;
+}
+.btn-area {
+  margin-top: 20px;
+  text-align: center;
+}
+.btn-area button {
+  padding: 8px 20px;
+  font-size: 14px;
+}
+.note-required {
+  color: red;
+  margin-bottom: 12px;
+}
+textarea {
+  width: 100%;
+  height: 100px;
+}
+.disabled-input {
+  background-color: #ddd !important;
+  cursor: not-allowed;
+  border: 1px solid #ccc;
+}
+
+/* セクション構造  */
+.sect {
+  margin-bottom: 20px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+.sect:last-of-type {
+  border-bottom: none;
+}
+.sub-sect {
+  padding: 12px 0;
+  border-bottom: 1px solid #ffc2c2;
+}
+.sub-sect:last-of-type {
+  border-bottom: none;
+}
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding-left: 16px;
+  margin-top: 6px;
+}
+.checkbox-group label {
+  min-width: 140px;
+}

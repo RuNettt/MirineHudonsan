@@ -1,0 +1,3 @@
+id,username,password_hash,email,full_name,furigana,phone,zipcode,prefecture,city,area,detailed_address,birthdate,gender,created_at,is_admin
+1,testuser1,hashedpass1,test1@example.com,田中太郎,タナカタロウ,09012345678,1000001,東京都,千代田区,丸の内1-1-1,グランドタワー101,1990-01-01,male,2025-06-30 12:00:00,0
+2,adminuser,hashedpass2,admin@example.com,山田花子,ヤマダハナコ,08098765432,1000002,東京都,港区,南青山2-2-2,オフィスビル5F,1985-05-15,female,2025-06-30 13:00:00,1
