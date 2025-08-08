@@ -660,6 +660,7 @@ def get_all_bukken():
             "customer_registration": b.customer_registration,
             "image_paths": image_paths,
             "created_at": b.created_at.strftime("%Y-%m-%d %H:%M:%S") if isinstance(b.created_at, datetime) else None
+            #"created_at": b.created_at.strftime("%Y-%m-%d %H:%M:%S") if b.created_at else None
         })
 
     return jsonify(result)
