@@ -17,6 +17,11 @@ import BukkenDetail from "./pages/BukkenDetail";
 import AdminBukkenList from "./pages/AdminBukkenList"; 
 import AdminBukkenEdit from "./pages/AdminBukkenEdit";
 import Favorites from "./pages/Favorites";
+import StoreSearch from "./pages/StoreSearch";
+import TransferSearch from "./pages/TransferSearch";
+import FavoritesStore from "./pages/FavoritesStore";
+import FavoritesTransfer from "./pages/FavoritesTransfer";
+import SavedConditions from "./pages/SavedConditions";
 
 function NavigationButtons({ current }) {
   const navigate = useNavigate();
@@ -87,6 +92,35 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserEditProfileForm />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 保存した検索条件 */}
+          <Route
+            path="/saved-conditions"
+            element={
+              <ProtectedRoute>
+                <SavedConditions />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* StoreSearch */}
+          <Route
+            path="/store-search"
+            element={
+              <ProtectedRoute>
+                <StoreSearch />
+              </ProtectedRoute>
+            }
+          />
+          {/* StoreSearch */}
+          <Route
+            path="/transfer-search"
+            element={
+              <ProtectedRoute>
+                <TransferSearch />
               </ProtectedRoute>
             }
           />
@@ -186,7 +220,14 @@ function App() {
           <Route
             path="/favorites"
             element={
-                <Favorites />
+                <FavoritesStore />
+            }
+          />
+
+          <Route
+            path="/favorites-transfer"
+            element={
+                <FavoritesTransfer />
             }
           />
 

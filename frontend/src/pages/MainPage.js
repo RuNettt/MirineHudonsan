@@ -1,65 +1,76 @@
+// src/pages/MainPage.js
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import LogoutButton from "../components/LogoutButton";
+import SiteHeader from "../components/SiteHeader"; // 공용 헤더
 import "../components/MainPage.css";
 
 import StoreSearch from "./StoreSearch";
 import TransferSearch from "./TransferSearch";
 
-const AREA_OPTIONS = [
-  { key: "metro", label: "首都圏エリア" }, // 기본(전체)
-  { key: "osaka", label: "大阪エリア" },
-  { key: "hyogo", label: "兵庫エリア" },
-  { key: "east", label: "東部エリア" },
-];
-
-// 각 드롭다운 키에 대해 매물 필터 규칙 정의
-function matchArea(item, selectedKey) {
-  if (!selectedKey || selectedKey === "metro") return true; // 전체
-  const L = `${item.large_area || ""}${item.small_area || ""}${item.address_town || ""}`;
-  if (selectedKey === "osaka") return /大阪/.test(L);
-  if (selectedKey === "hyogo") return /兵庫/.test(L);
-  if (selectedKey === "east") return /(千葉|埼玉|茨城|栃木|群馬|東|船橋|柏|浦安|川口|越谷)/.test(L); // 필요시 키워드 조정
-  return true;
-}
+const AREA_LABELS = ["首都圏", "東京23区", "東京都下", "横浜・川崎", "埼玉", "千葉", "大阪"];
+const normalizeArea = (s) => (s || "").toString().trim().replace(/\s+/g, "").replace(/[\/･]/g, "・");
+const matchByAreaLabel = (item, selectedLabel) => {
+  if (!selectedLabel || selectedLabel === "首都圏") return true;
+  const raw = item?.large_area ?? item?.area ?? "";
+  return normalizeArea(raw) === normalizeArea(selectedLabel);
+};
+const firstImage = (b) => {
+  const base = (process.env.REACT_APP_API_BASE_URL || "").replace(/\/+$/, "");
+  let p = b?.image_paths;
+  try {
+    if (typeof p === "string") {
+      const j = JSON.parse(p);
+      if (Array.isArray(j)) p = j;
+    }
+  } catch {}
+  const f = Array.isArray(p) ? p[0] : null;
+  if (!f) return "/no-image.jpg";
+  if (/^https?:\/\//i.test(f) || f.startsWith("data:")) return f;
+  return `${base}/api/admin/uploads/${f}`;
+};
 
 function MainPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [pageMode, setPageMode] = useState("home");
-  const [allBukkens, setAllBukkens] = useState([]);
-  const [selectedArea, setSelectedArea] = useState("metro"); // 기본: 首都圏エリア
-  const token = localStorage.getItem("token");
+  const [all, setAll] = useState([]);
+  const [selectedArea, setSelectedArea] = useState("首都圏");
 
-  // 전체 데이터 로드 (추천 스트립/리스트용)
+  // ?area 또는 localStorage 로 초기화
+  useEffect(() => {
+    const qsArea = new URLSearchParams(location.search).get("area");
+    if (qsArea && AREA_LABELS.includes(qsArea)) {
+      setSelectedArea(qsArea);
+      try {
+        localStorage.setItem("selectedArea", qsArea);
+      } catch {}
+    } else {
+      const saved = localStorage.getItem("selectedArea");
+      setSelectedArea(saved && AREA_LABELS.includes(saved) ? saved : "首都圏");
+    }
+  }, [location.search]);
+
+  // 전체 데이터 로드
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/bukken/all`);
-        if (Array.isArray(res.data)) {
-          setAllBukkens(res.data);
-        } else {
-          setAllBukkens([]);
-        }
-      } catch (err) {
-        console.error("物件データ取得失敗 /bukken/all:", err);
-        setAllBukkens([]);
+        const base = (process.env.REACT_APP_API_BASE_URL || "").replace(/\/+$/, "");
+        const res = await axios.get(`${base}/api/admin/bukken/all`);
+        const list = Array.isArray(res.data) ? res.data : res.data?.results || [];
+        setAll(list || []);
+      } catch (e) {
+        console.error("/bukken/all 取得失敗:", e);
+        setAll([]);
       }
     })();
   }, []);
 
-  const filtered = useMemo(
-    () => allBukkens.filter((b) => matchArea(b, selectedArea)),
-    [allBukkens, selectedArea]
-  );
+  const filtered = useMemo(() => all.filter((b) => matchByAreaLabel(b, selectedArea)), [all, selectedArea]);
+  const featured = useMemo(() => filtered.slice(0, 8), [filtered]);
+  const latest = useMemo(() => filtered.slice(0, 12), [filtered]);
 
-  const featured = useMemo(() => filtered.slice(0, 8), [filtered]); // 상단 가로 썸네일
-  const latest = useMemo(() => filtered.slice(0, 12), [filtered]); // 최신 리스트(가운데)
-
-  const goToLogin = () => navigate("/login");
-  const goToProfile = () => navigate("/profile");
-  const goToFavorites = () => navigate("/favorites");
   const gotoDetail = (id) => navigate(`/bukken/${id}`);
 
   if (pageMode === "store") return <StoreSearch onBack={() => setPageMode("home")} />;
@@ -67,146 +78,64 @@ function MainPage() {
 
   return (
     <div className="mp-container">
-      {/* 헤더 바 */}
-      <div className="mp-header">
-        <div className="mp-brand" onClick={() => setPageMode("home")}>
-          飲食店ミリネ{/* 로고 자리 - 이미지 쓰면 여기에 img */}
-        </div>
+      {/* 공용 헤더 — 헤더의 エリア는 /main?area=...로 이동만 처리 */}
+      <SiteHeader selectedArea={selectedArea} />
 
-        {/* エリア ドロップダウン */}
-        <div className="mp-area">
-          <div className="dropdown">
-            <button className="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-              {AREA_OPTIONS.find((o) => o.key === selectedArea)?.label || "エリア"}
-            </button>
-            <ul className="dropdown-menu">
-              {AREA_OPTIONS.map((opt) => (
-                <li key={opt.key}>
-                  <button
-                    className={`dropdown-item ${selectedArea === opt.key ? "active" : ""}`}
-                    onClick={() => setSelectedArea(opt.key)}
-                  >
-                    {opt.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+      {/* 본문: 추천/최신 */}
+      <div className="mp-featured-block container">
+        <h5 className="mp-section-title">店舗物件情報を続々と配信中！</h5>
 
-        {/* 우측 계정/즐겨찾기 */}
-        <div className="mp-right">
-          <button className="btn btn-outline-warning me-2" onClick={goToFavorites}>
-            ★ お気に入り
-          </button>
-          {token ? (
-            <>
-              <button className="btn btn-outline-secondary me-2" onClick={goToProfile}>
-                プロフィール
-              </button>
-              <LogoutButton />
-            </>
-          ) : (
-            <button className="btn btn-outline-primary" onClick={goToLogin}>
-              ログイン
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* 탭형 링크 */}
-      <div className="mp-tabs">
-        <button className="mp-tab" onClick={() => setPageMode("store")}>
-          店舗物件を探す
-        </button>
-        <button className="mp-tab" onClick={() => setPageMode("transfer")}>
-          譲渡情報を探す
-        </button>
-      </div>
-
-      {/* 제목 */}
-      <h5 className="mp-section-title">
-        店舗物件情報を続々と配信中！
-      </h5>
-
-      {/* 가로 썸네일 스트립 */}
-      <div className="mp-strip">
-        {featured.map((b) => (
-          <div key={b.id} className="mp-thumb" onClick={() => gotoDetail(b.id)}>
-            <img
-              src={
-                b.image_paths && b.image_paths.length > 0
-                  ? `${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${b.image_paths[0]}`
-                  : "/no-image.jpg"
-              }
-              alt="thumb"
-            />
-            <div className="mp-thumb-meta">
-              <span className="mp-badge">{b.small_area || b.large_area || "—"}</span>
-              <div className="mp-thumb-text">{b.address_town || b.address_building || "　"}</div>
-              <div className="mp-thumb-sub">
-                {b.tsubo ? `${b.tsubo}坪` : b.m2 ? `${b.m2}㎡` : ""}{" "}
-                {b.rent ? ` / ${b.rent}円` : ""}
+        {/* 가로 썸네일 스트립 */}
+        <div className="mp-strip">
+          {featured.map((b) => (
+            <div key={b.id} className="mp-thumb" onClick={() => gotoDetail(b.id)}>
+              <img src={firstImage(b)} alt="thumb" />
+              <div className="mp-thumb-meta">
+                <span className="mp-badge">{b.small_area || b.large_area || "—"}</span>
+                <div className="mp-thumb-text">{b.address_town || b.address_building || "　"}</div>
+                <div className="mp-thumb-sub">
+                  {b.tsubo ? `${b.tsubo}坪` : b.m2 ? `${b.m2}㎡` : ""} {b.rent ? ` / ${b.rent}円` : ""}
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 중앙 최신 리스트 */}
-      <div className="mp-latest">
-        <div className="mp-latest-header">
-          <span className="mp-chip">新着物件!!</span>
-          <span className="mp-latest-title">リアルタイムな更新速報です！</span>
-        </div>
-
-        <div className="mp-latest-list">
-          {latest.map((b, idx) => (
-            <div key={b.id} className="mp-latest-row" onClick={() => gotoDetail(b.id)}>
-              <span className="mp-row-badge">{b.small_area || b.large_area || "—"}</span>
-              <span className="mp-row-title">
-                {b.address_town || b.address_building || "所在地未登録"} の物件
-              </span>
-              <span className="mp-row-meta">
-                {b.created_at ? b.created_at : ""}{" "}
-              </span>
             </div>
           ))}
-          {latest.length === 0 && (
-            <div className="text-muted">該当する物件がありません。</div>
-          )}
+          {featured.length === 0 && <div className="text-muted">該当する物件がありません。</div>}
+        </div>
+
+        {/* 최신 리스트 */}
+        <div className="mp-latest">
+          <div className="mp-latest-header">
+            <span className="mp-chip">新着物件!!</span>
+            <span className="mp-latest-title">リアルタイムな更新速報です！</span>
+          </div>
+
+          <div className="mp-latest-list">
+            {latest.map((b) => (
+              <div key={b.id} className="mp-latest-row" onClick={() => gotoDetail(b.id)}>
+                <span className="mp-row-badge">{b.small_area || b.large_area || "—"}</span>
+
+                <div className="mp-row-info">
+                  <div className="mp-row-title">
+                    {b.address_town || b.address_building || "所在地未登録"} の物件
+                  </div>
+                  <div className="mp-row-sub">
+                    {(b.large_area || b.small_area) && <span>{b.large_area || b.small_area}</span>}
+                    {b.tsubo && <span>・{b.tsubo}坪</span>}
+                    {b.station && <span>・{b.station}</span>}
+                  </div>
+                </div>
+
+                <span className="mp-row-meta">{b.created_at || ""}</span>
+              </div>
+            ))}
+            {latest.length === 0 && <div className="text-muted">該当する物件がありません。</div>}
+          </div>
         </div>
       </div>
 
-      {/* 아래 전체 카드 그리드(옵션). 필요 없으면 이 섹션 삭제해도 됨 */}
-      <div className="mp-grid">
-        {filtered.map((b) => (
-          <div key={b.id} className="mp-card" onClick={() => gotoDetail(b.id)}>
-            <img
-              src={
-                b.image_paths && b.image_paths.length > 0
-                  ? `${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${b.image_paths[0]}`
-                  : "/no-image.jpg"
-              }
-              alt="card"
-            />
-            <div className="mp-card-body">
-              <div className="mp-card-title">
-                {b.large_area} {b.small_area}
-              </div>
-              <div className="mp-card-addr">
-                {[b.address_town, b.address_chome, b.address_banchi, b.address_go, b.address_building]
-                  .filter(Boolean)
-                  .join(" ")}
-              </div>
-              <div className="mp-card-meta">
-                <span>{b.rent ? `賃料: ${b.rent} 円` : "賃料: 未設定"}</span>
-                <span>{b.structure || "構造: -"}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-        {filtered.length === 0 && <p className="text-muted">物件が見つかりませんでした。</p>}
+      {/* ✅ 하단 중앙 브랜드 라벨 */}
+      <div className="mp-bottom-brand" aria-hidden="true">
+        Restaurant Property Search System
       </div>
     </div>
   );

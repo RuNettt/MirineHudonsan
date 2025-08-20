@@ -95,7 +95,7 @@ function AdminBukkenRegisterStep2({ editMode = false, initialForm = null}) {
   const [selectedState, setSelectedState] = useState("")
   const [canSubmit, setCanSubmit] = useState(false);
   const [depositType, setDepositType] = useState("month");
-  const [dealType, setDealType] = useState("ippan_baikai")
+  const [dealType, setDealType] = useState("店舗物件")
   const [isRentNegotiable, setIsRentNegotiable] = useState(false);
   const [isDepositNegotiable, setIsDepositNegotiable] = useState(false);
   const [isKeyMoneyNegotiable, setIsKeyMoneyNegotiable] = useState(false);
@@ -134,12 +134,11 @@ function AdminBukkenRegisterStep2({ editMode = false, initialForm = null}) {
   
     // 이미지
     if (images && images.length > 0) {
-      formData.append("image_paths", JSON.stringify(images));
-    } else {
-      formData.append("image_paths", JSON.stringify([]));
+      images.forEach((file) => {
+        formData.append("images", file);
+      });
     }
-    
-  
+
      // フォーム入力データ追加
     Object.entries(form).forEach(([key, value]) => {
       if (value !== null && value !== "") {
@@ -293,7 +292,7 @@ function AdminBukkenRegisterStep2({ editMode = false, initialForm = null}) {
       setFloorValue2(String(initialForm.floor_value2 ?? ""));
       setCheckbox1(!!initialForm.whole_building);
       setExtraCondition(!!initialForm.extra_condition);
-      setDealType(initialForm.deal_type || "ippan_baikai");
+      setDealType(initialForm.deal_type || "店舗物件");
       setDepositType(initialForm.deposit_month ? "month" : "yen");
       setIsDepositNegotiable(initialForm.deposit_neg || false);
       setSelectedState(initialForm.state || "");
@@ -709,11 +708,13 @@ function AdminBukkenRegisterStep2({ editMode = false, initialForm = null}) {
                       setDealType(e.target.value);
                       handleChange(e)
                     }}>
-                        <option value="kashinushi">貸主</option>
+                        {/* <option value="kashinushi">貸主</option>
                         <option value="dairi">代理</option>
                         <option value="senzoku">専属</option>
                         <option value="sennin">専任</option>
-                        <option value="ippan_baikai">一般</option>
+                        <option value="ippan_baikai">一般</option> */}
+                        <option value="店舗物件">店舗物件</option>
+                        <option value="譲渡情報">譲渡情報</option>
                     </select>
                   </td>
             </tr>

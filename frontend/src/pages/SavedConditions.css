@@ -1,0 +1,328 @@
+/* src/pages/SavedConditions.css */
+
+/* 공통 최대폭 / 제목 미세정렬 변수 */
+:root {
+  --scv-max: 1080px;
+  --scv-heading-nudge: 91px;   /* 제목을 카드 박스선과 맞추는 좌측 인덴트 */
+}
+
+/* ====== 리스트 컨테이너 ====== */
+.scv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: var(--scv-max);
+  margin: 0 auto;
+}
+
+/* ✅ 제목을 카드 박스선과 정확히 맞춤 */
+.container.my-4 > h2,
+.container.my-4 > h2.mb-3 {
+  max-width: var(--scv-max);     /* .scv-list 와 동일 폭 */
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 12px;
+  padding-left: var(--scv-heading-nudge); /* 카드 박스선과 시각적으로 일치 */
+  box-sizing: content-box;
+}
+
+/* ====== 카드 ====== */
+.scv-card {
+  display: grid;
+  grid-template-columns: 44px 1fr 240px; /* 좌번호 / 본문 / 우측 버튼 */
+  gap: 14px;
+  background: #fff;
+  border: 1px solid #E9EEF3;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 2px rgba(16,24,40,.04);
+}
+
+.scv-left { 
+  display: flex; 
+  align-items: flex-start; 
+  justify-content: center; 
+}
+
+.scv-num {
+  width: 28px;
+  height: 28px; 
+  line-height: 28px; 
+  border-radius: 14px;
+  background: #0d6efd; 
+  color: #fff; 
+  font-weight: 700; 
+  text-align: center; 
+  font-size: 14px;
+}
+
+/* 상단 라인 */
+.scv-main { 
+  min-width: 0; 
+}
+
+.scv-topline {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 4px;
+}
+
+.scv-type { 
+  color: #ff7a00; 
+  font-weight: 700; 
+}
+
+.scv-date { 
+  color: #667085; 
+  font-size: 12px; 
+  white-space: nowrap; 
+}
+
+.scv-title { 
+  font-weight: 700; 
+  margin-bottom: 10px; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
+
+/* ===== 조건 라인 ===== */
+.scv-detail-line {
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 8px 10px; 
+  align-items: flex-start;
+  margin: 6px 0; 
+  font-size: 13px; 
+  color: #344054;
+}
+
+.scv-bullet { width: 10px; 
+  text-align: center; 
+  color: #ff7a00; 
+  font-weight: 700; 
+}
+
+.scv-detail-title { 
+  min-width: 80px; 
+  color: #475467; 
+  font-weight: 600; 
+}
+
+/* 칩 */
+.scv-chip {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px;
+  padding: 3px 8px; 
+  border: 1px solid #E5E7EB; 
+  border-radius: 999px; 
+  background: #fff; 
+  line-height: 1.2;
+}
+
+.scv-chip-label {
+  display: inline-block; 
+  min-width: 74px; 
+  padding: 2px 6px; 
+  text-align: center;
+  font-size: 12px; 
+  color: #667085; 
+  background: #F3F4F6; 
+  border-radius: 8px;
+}
+
+/* ===== 메모 영역 ===== */
+.scv-note { 
+  margin-top: 10px; 
+}
+
+.scv-note-label { 
+  font-size: 12px; 
+  color:#667085; 
+  margin-bottom: 6px; 
+}
+
+/* 보기용 메모 박스: 바깥 테두리 진하게, 길이 넉넉히 */
+.scv-memo-box {
+  width: 100%;
+  background: #fff !important;
+  border: 2px solid #64748b;      /* 바깥쪽 선을 더 진하게 */
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-height: 120px;              /* 길이 늘림 */
+  white-space: pre-wrap;
+  color: #111827;
+}
+.scv-memo-box.placeholder { color: #9ca3af; }
+
+/* 편집용 텍스트에어리어 */
+.scv-note-input {
+  width: 100%;
+  min-height: 160px;              /* 편집 시 더 넉넉히 */
+  font-size: 13px;
+  background: #fff;
+  border: 2px solid #3b82f6;      /* 진한 테두리 */
+  border-radius: 10px;
+  resize: vertical;
+}
+.scv-note-input:focus { 
+  outline: none; 
+  box-shadow: 0 0 0 2px rgba(59,130,246,.12); 
+}
+
+.scv-note-caption { 
+  font-size: 11px;
+  color:#98A2B3;
+  margin-top: 6px;
+}
+
+/* 메모 액션 버튼 오른쪽 정렬 */
+.scv-note-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  margin-top: 8px; 
+  gap: 8px; 
+}
+
+/* ===== 우측 영역(매치/버튼) — 아래로 내리기 ===== */
+.scv-right {
+  display: flex; 
+  flex-direction: column; 
+  align-items: flex-end; 
+  gap: 10px;
+  margin-top: 28px;               /* 데스크톱 기준 아래로 */
+}
+
+@media (min-width: 1200px){
+  .scv-right { 
+    margin-top: 120px; 
+  }/* 더 큰 화면에서 조금 더 아래 */
+}
+
+/* “件がマッチ” */
+.scv-count { 
+  display: flex; 
+  align-items: baseline; 
+  gap: 6px; 
+  white-space: nowrap; 
+}
+
+.scv-count-num { 
+  font-size: 24px; 
+  font-weight: 800; 
+  color: #1f2937; 
+  line-height: 1; 
+}
+
+.scv-count-txt { 
+  font-size: 14px; 
+  color: #374151; 
+  line-height: 1; 
+}
+
+/* 버튼 */
+.scv-btn-match, .scv-btn-delete { 
+  width: 100%; 
+}
+
+.scv-btn-match {
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center;
+  gap: 6px; 
+  font-weight: 700; 
+  padding: 10px 12px;
+}
+
+.scv-ico { 
+  font-size: 18px; 
+}
+
+.scv-btn-delete { 
+  font-weight: 600; 
+}
+
+/* 반응형 */
+@media (max-width: 1200px){
+  .scv-list { 
+    max-width: 980px; 
+  }
+  .container.my-4 > h2,
+  .container.my-4 > h2.mb-3 { 
+    max-width: 980px; 
+  }
+  .scv-card { 
+    grid-template-columns: 
+    44px 1fr 220px; 
+  }
+}
+
+@media (max-width: 992px){
+  .scv-list { max-width: 100%; }
+  .container.my-4 > h2,
+  .container.my-4 > h2.mb-3 {
+    max-width: 100%;
+    padding-left: 12px;           /* 부트스트랩 컨테이너 기본 좌여백과 동일 */
+  }
+  .scv-card { 
+    grid-template-columns: 40px 1fr; 
+  }
+  .scv-right { grid-column: 2 / 3; align-items: flex-start; 
+    margin-top: 16px; 
+  }
+  .scv-btn-match, .scv-btn-delete { width: auto; }
+}
+
+@media (max-width: 640px){
+  .scv-card { 
+    padding: 14px; 
+  }
+}
+
+/* 페이지네이션 */
+.scv-pager {
+  display:flex; 
+  align-items:center; 
+  justify-content:center;
+  gap:10px; 
+  margin-top:16px; 
+  flex-wrap:wrap;
+}
+
+.scv-page-btn {
+  padding:6px 10px; 
+  border:1px solid #d1d5db; 
+  background:#fff; 
+  border-radius:6px;
+}
+
+.scv-page-btn:disabled { 
+  opacity:.5; 
+  cursor:not-allowed; 
+}
+
+.scv-page-numbers { 
+  display:flex; 
+  gap:6px; 
+}
+
+.scv-page-num {
+  min-width:36px; 
+  height:32px; 
+  border:1px solid #d1d5db; 
+  background:#fff; 
+  border-radius:6px;
+}
+
+.scv-page-num.active {
+  background:#2563eb; 
+  color:#fff; 
+  border-color:#2563eb;
+}
+
+.scv-page-info { 
+  color:#6b7280; 
+  font-size:.9rem; 
+}
