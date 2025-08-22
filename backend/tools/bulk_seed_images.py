@@ -15,7 +15,8 @@ except Exception:
     from app.models import db, Bukken  # noqa
 
 # ---- 사용자 설정 ----
-SRC_DIR = r"C:\Users\mg-e1\Pictures\hudousan"   # 테스트 이미지 모아둔 폴더
+# SRC_DIR = r"C:\Users\mg-e1\Pictures\hudousan"   # 테스트 이미지 모아둔 폴더
+SRC_DIR = os.environ.get("SRC_DIR", r"C:\Users\mg-e1\Pictures\hudousan") # docker용
 EACH = 1                                 # 매물(id) 하나당 몇 장 넣을지
 SHUFFLE = True                           # True면 각 id마다 랜덤 선택
 APPEND = False                           # True면 기존 image_paths에 추가, False면 덮어쓰기

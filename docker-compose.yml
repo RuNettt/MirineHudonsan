@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: hudonsan-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: store
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+      TZ: Asia/Tokyo
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hudonsan-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # SQLAlchemy URL for MySQL inside the compose network
+      DATABASE_URL: mysql+pymysql://appuser:apppass@db:3306/store
+      FLASK_ENV: production
+      PYTHONUNBUFFERED: "1"
+      FRONTEND_ORIGIN: http://localhost:8080
+      TZ: Asia/Tokyo
+    volumes:
+      - ./backend:/app  # convenient for live edits; remove for production immutability
+      - ./backend/uploads:/app/app/uploads
+      - C:\Users\mg-e1\Pictures\hudousan:/images:ro   # 호스트 사진 폴더 → 컨테이너 /images
+      - ./uploads:/app/uploads   
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # API is reverse-proxied at /api by nginx, so use same-origin
+        REACT_APP_API_BASE_URL: /api
+    container_name: hudonsan-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+    environment:
+      TZ: Asia/Tokyo
+
+volumes:
+  db-data:
+  uploads_data: #1
