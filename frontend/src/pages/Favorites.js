@@ -53,9 +53,12 @@ function Favorites() {
             >
               <img
                 src={
-                  item.image_paths && item.image_paths.length > 0
-                    ? `${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${item.image_paths[0]}`
-                    : "/no-image.jpg"
+                  //item.image_paths && item.image_paths.length > 0
+                  //  ? `${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${item.image_paths[0]}`
+                  //  : "/no-image.jpg"
+                  item?.image_paths?.length
+                    ? toImageUrl(item.image_paths[0])   // ← 파일명만 뽑아 /images/파일명 으로
+                    : '/images/no-image.jpg'            // ← 없을 때는 플레이스홀더
                 }
                 className="card-img-top"
                 alt="物件画像"
