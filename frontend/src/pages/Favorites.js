@@ -1,6 +1,7 @@
 // src/pages/Favorites.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toImageUrl } from '../utils/image';
 
 function Favorites() {
   const [storeFavorites, setStoreFavorites] = useState([]);

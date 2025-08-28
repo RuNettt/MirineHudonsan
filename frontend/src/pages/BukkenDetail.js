@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../components/BukkenDetail.css";
+import { toImageUrl } from '../utils/image';
 
 function BukkenDetailPage() {
   const { id } = useParams(); // URLから物件IDを取得
@@ -126,7 +127,8 @@ function BukkenDetailPage() {
         {bukken.image_paths.map((path, idx) => (
           <img
             key={idx}
-            src={`${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${path}`}
+            // src={`${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${path}`} local用
+            src={toImageUrl(path)} // server用
             alt={`img-${idx}`}
             onClick={() => setCurrentIndex(idx)}
           />
@@ -138,7 +140,8 @@ function BukkenDetailPage() {
         <div className="modal-overlay" onClick={() => setCurrentIndex(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <img
-              src={`${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${bukken.image_paths[currentIndex]}`}
+              // src={`${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${bukken.image_paths[currentIndex]}`} local用
+              src={toImageUrl(bukken.image_paths[currentIndex])} // server用
               alt="拡大画像"
             />
             <button className="close-btn" onClick={() => setCurrentIndex(null)}>×</button>

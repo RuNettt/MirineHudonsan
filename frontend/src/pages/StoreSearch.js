@@ -4,6 +4,7 @@ import SearchModal from "../components/SearchModal";
 import SiteHeader from "../components/SiteHeader";
 import { useNavigate } from "react-router-dom";
 import "./StoreSearch.css";
+import { toImageUrl } from '../utils/image';
 
 /* ================= 설정: 페이지당 아이템 수 ================= */
 const PAGE_SIZE = 6;

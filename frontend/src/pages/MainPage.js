@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import SiteHeader from "../components/SiteHeader"; // 공용 헤더
 import "../components/MainPage.css";
+import { toImageUrl } from '../utils/image';
 
 import StoreSearch from "./StoreSearch";
 import TransferSearch from "./TransferSearch";

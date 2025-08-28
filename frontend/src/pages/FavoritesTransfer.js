@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import SiteHeader from "../components/SiteHeader";
 import "./Favorites.css";
+import { toImageUrl } from '../utils/image';
 
 /* 한 페이지당 표시 건수 */
 const PER_PAGE = 4;

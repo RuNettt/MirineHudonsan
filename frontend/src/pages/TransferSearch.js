@@ -4,6 +4,7 @@ import SearchModal from "../components/SearchModal";
 import SiteHeader from "../components/SiteHeader";
 import { useNavigate } from "react-router-dom";
 import "./TransferSearch.css";
+import { toImageUrl } from '../utils/image';
 
 /* ============== 設定: ページサイズ ============== */
 const PAGE_SIZE = 6;
