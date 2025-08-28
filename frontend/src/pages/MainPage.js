@@ -90,7 +90,8 @@ function MainPage() {
         <div className="mp-strip">
           {featured.map((b) => (
             <div key={b.id} className="mp-thumb" onClick={() => gotoDetail(b.id)}>
-              <img src={firstImage(b)} alt="thumb" />
+              {/* <img src={firstImage(b)} alt="thumb" />  local용 */}
+              <img src={firstImage(b, '/images/placeholder.jpg')} alt="thumb" />
               <div className="mp-thumb-meta">
                 <span className="mp-badge">{b.small_area || b.large_area || "—"}</span>
                 <div className="mp-thumb-text">{b.address_town || b.address_building || "　"}</div>

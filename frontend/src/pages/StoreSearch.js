@@ -1059,7 +1059,8 @@ function StoreSearch({ onBack }) {
                         <div className={`jp-thumb ${img ? "" : "noimg"}`}>
                           {img ? (
                             <img
-                              src={img}
+                              // src={img} local 용
+                              src={toImageUrl(img)}
                               alt="物件画像"
                               onError={(e) => {
                                 e.currentTarget.style.display = "none";

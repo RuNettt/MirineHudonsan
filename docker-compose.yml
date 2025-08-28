@@ -41,6 +41,7 @@ services:
       - ./backend:/app  # convenient for live edits; remove for production immutability
       - ./backend/uploads:/app/app/uploads
       - C:\Users\mg-e1\Pictures\hudousan:/images:ro   # 호스트 사진 폴더 → 컨테이너 /images  local용
+      - ./images:/images:ro # server
       - ./uploads:/app/uploads   
     ports:
       - "5000:5000"
