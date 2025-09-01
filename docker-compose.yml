@@ -34,17 +34,18 @@ services:
       DATABASE_URL: mysql+pymysql://appuser:apppass@db:3306/store
       FLASK_ENV: production
       PYTHONUNBUFFERED: "1"
-      FRONTEND_ORIGIN: http://175.41.208.140:8080
+      FRONTEND_ORIGIN: http://mirineglobaltenpo.com,http://www.mirineglobaltenpo.com
+      # FRONTEND_ORIGIN: http://175.41.208.140:8080
       # FRONTEND_ORIGIN: http://localhost:8080 local用
       TZ: Asia/Tokyo
     volumes:
       - ./backend:/app  # convenient for live edits; remove for production immutability
       - ./backend/uploads:/app/app/uploads
-      - C:\Users\mg-e1\Pictures\hudousan:/images:ro   # 호스트 사진 폴더 → 컨테이너 /images  local용
+      # - C:\Users\mg-e1\Pictures\hudousan:/images:ro   # 호스트 사진 폴더 → 컨테이너 /images  local용
       - ./images:/images:ro # server
       - ./uploads:/app/uploads   
-    ports:
-      - "5000:5000"
+    # ports:
+    #  - "5000:5000"
 
   frontend:
     build:
@@ -60,6 +61,7 @@ services:
       - ./images:/usr/share/nginx/html/images:ro # server
       - ./uploads:/usr/share/nginx/html/uploads:ro #server
     ports:
+      - "80:80"
       - "8080:80"
     environment:
       TZ: Asia/Tokyo
