@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import postal_code from "japan-postal-code";
 import { useNavigate } from "react-router-dom";
+import "./UserRegister.css";
 
 
 function RegisterForm() {
@@ -76,6 +77,19 @@ function RegisterForm() {
   };
 
   return (
+    <div>
+      {/* ✅ 카드 밖 상단 오른쪽에 버튼 */}
+      <h2 className="page-title">会員登録</h2>
+      <div className="d-flex justify-content-end mb-2">
+        <button
+          type="button"
+          className="btn btn-outline-secondary"
+          onClick={() => navigate(-1)}
+        >
+          ← 戻る
+        </button>
+      </div>
+
     <form onSubmit={handleSubmit} className="card p-4 shadow-sm">
   <input name="username" placeholder="ID" onChange={handleChange} className="form-control mb-2" />
   <input name="password" type="password" placeholder="パスワード" onChange={handleChange} className="form-control mb-2" />
@@ -103,6 +117,7 @@ function RegisterForm() {
 
   <button type="submit" className="btn btn-primary">会員登録</button>
 </form>
+    </div>
 
   );
 }
