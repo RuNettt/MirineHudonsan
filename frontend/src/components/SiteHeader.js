@@ -36,7 +36,7 @@ export default function SiteHeader({ selectedArea }) {
       <div className="container sh-inner">
         {/* Left: ロゴ */}
         <button className="sh-brand" onClick={go("/main")} aria-label="ホームへ">
-          飲食店舗
+          飲食店舗専門検索
         </button>
 
         {/* Center: タブ */}

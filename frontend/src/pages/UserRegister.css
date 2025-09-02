@@ -1,0 +1,4 @@
+.page-title {
+  margin-top: 0.5rem;   /* 위쪽 여백 줄이기 */
+  margin-bottom: -2.5rem;  /* 아래쪽 간격 적당히 */
+}

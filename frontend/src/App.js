@@ -62,7 +62,6 @@ function App() {
             path="/register"
             element={
               <>
-                <h2>会員登録</h2>
                 <UserRegisterForm />
               </>
             }

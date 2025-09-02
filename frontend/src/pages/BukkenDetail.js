@@ -1,41 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../components/BukkenDetail.css";
-import { toImageUrl } from '../utils/image';
+import SiteHeader from "../components/SiteHeader";
+import { toImageUrl } from "../utils/image";
 
 function BukkenDetailPage() {
   const { id } = useParams(); // URLから物件IDを取得
   const [bukken, setBukken] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(null); // モーダルで拡大中の画像index
   const navigate = useNavigate();
-  const goToMain = () => {
-    navigate("/main");
-  };
+
+  const goToMain = () => navigate("/main");
 
   useEffect(() => {
-      // 🚀 初回マウント時、物件詳細を取得
-    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/bukken/${id}`)
-      .then(res => setBukken(res.data))
-      .catch(err => console.error("詳細情報取得失敗:", err));
+    // 🚀 初回マウント時、物件詳細を取得
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/api/admin/bukken/${id}`)
+      .then((res) => setBukken(res.data))
+      .catch((err) => console.error("詳細情報取得失敗:", err));
   }, [id]);
 
-   // 🖼️ モーダル次の画像
+  // 🖼️ モーダル次の画像
   const handleNext = () => {
-    if (bukken && currentIndex !== null) {
+    if (bukken && currentIndex !== null && bukken.image_paths?.length) {
       setCurrentIndex((currentIndex + 1) % bukken.image_paths.length);
     }
   };
   // 🖼️ モーダル前の画像
   const handlePrev = () => {
-    if (bukken && currentIndex !== null) {
-      setCurrentIndex((currentIndex - 1 + bukken.image_paths.length) % bukken.image_paths.length);
+    if (bukken && currentIndex !== null && bukken.image_paths?.length) {
+      setCurrentIndex(
+        (currentIndex - 1 + bukken.image_paths.length) % bukken.image_paths.length
+      );
     }
   };
 
   // お気に入り追加処理
   const handleAddFavorite = () => {
+    if (!bukken) return;
     const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
     const exists = favorites.find((item) => item.id === bukken.id);
 
@@ -74,254 +77,253 @@ function BukkenDetailPage() {
     gym: "ジム・教室・スタジオ",
     other_service: "その他サービス・その他",
   };
-  
-   // カテゴリーを上位グループでまとめる
-  const CATEGORY_GROUPS = {
-    // 詳細項目がある場合、上位グループのみ表示
-    salon: ["salon_est", "salon_esthe", "salon_nail", "salon_other", "beauty_sal", "beauty_sub1"],
-    clinic: ["clinic", "clinic_c", "clinic_dent", "clinic_pharm", "clinic_other"],
-    retail: ["retail", "retail_app", "retail_conv", "retail_other"],
-    gym: ["gym", "gym_studio", "gym_gym", "gym_class", "gym_school"],
-    other: ["other_service", "other_store"],
-  };
-  
-  // 表示するカテゴリーを計算
-  const getDisplayCategories = (types) => {
-    const result = new Set();
-    console.log("business_types", bukken.business_types);
-    for (const key in types) {
-      if (!types[key]) continue;
-  
-    // 飲食系は常に個別表示
-      if (["food_light", "food_heavy", "food_bar"].includes(key)) {
-        result.add(CATEGORY_DISPLAY_MAP[key]);
-        continue;
-      }
-  
-      // 上位カテゴリーにまとめる
-      for (const [groupKey, keys] of Object.entries(CATEGORY_GROUPS)) {
-        if (keys.includes(key)) {
-          result.add(CATEGORY_DISPLAY_MAP[groupKey]); // 上位カテゴリ名追加
-
-        }
-      }
-    }
-  
-    return Array.from(result);
-  };
 
   if (!bukken) return <p>読み込み中...</p>;
 
   return (
-    <div className="detail-container">
-      <h2 className="title">物件詳細</h2>
-      {/* 🔙 メインページへ */}
-      <div className="d-flex justify-content-end mb-3 gap-2">
-        <button className="btn btn-outline-secondary" onClick={goToMain}>
-          メインページ
-        </button>
-      </div>
-  
-      {/* 📷 画像ギャラリー */}
-      <div className="image-gallery">
-        {bukken.image_paths.map((path, idx) => (
-          <img
-            key={idx}
-            // src={`${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${path}`} local用
-            src={toImageUrl(path)} // server用
-            alt={`img-${idx}`}
-            onClick={() => setCurrentIndex(idx)}
-          />
-        ))}
-      </div>
-        
-      {/* 📷 クリックでモーダル */}
-      {currentIndex !== null && (
-        <div className="modal-overlay" onClick={() => setCurrentIndex(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <>
+      {/* ✅ 공용 헤더 추가 (상세의 large_area와 동기화하면 UX가 자연스러워요) */}
+      <SiteHeader selectedArea={bukken?.large_area} />
+
+      <div className="detail-container">
+        <h2 className="title">物件詳細</h2>
+
+        {/* 🔙 メインページへ */}
+        {/* <div className="d-flex justify-content-end mb-3 gap-2">
+          <button className="btn btn-outline-secondary" onClick={goToMain}>
+            メインページ
+          </button>
+        </div> */}
+
+        {/* 📷 画像ギャラリー */}
+        <div className="image-gallery">
+          {(bukken.image_paths || []).map((path, idx) => (
             <img
-              // src={`${process.env.REACT_APP_API_BASE_URL}/api/admin/uploads/${bukken.image_paths[currentIndex]}`} local用
-              src={toImageUrl(bukken.image_paths[currentIndex])} // server用
-              alt="拡大画像"
+              key={idx}
+              src={toImageUrl(path)} // server用
+              alt={`img-${idx}`}
+              onClick={() => setCurrentIndex(idx)}
             />
-            <button className="close-btn" onClick={() => setCurrentIndex(null)}>×</button>
-            <button className="nav-btn prev-btn" onClick={handlePrev}>‹</button>
-            <button className="nav-btn next-btn" onClick={handleNext}>›</button>
-          </div>
+          ))}
         </div>
-      )}
-  
-      {/* 📝 物件情報 */}
-      <div className="info-section">
-        <h4 className="section-title">物件情報</h4>
-        <button className="btn btn-warning mb-3" onClick={handleAddFavorite}>★ お気に入り追加</button>
-        <table className="info-table">
-          <tbody>
-            <tr>
-              <th>所在地</th>
-              <td>
-                {[bukken.large_area, bukken.small_area, bukken.address_town, 
-                  bukken.address_chome, bukken.address_banchi, 
-                  bukken.address_go, bukken.address_building]
-                  .filter(Boolean)
-                  .join(" ")
-                }
-              </td>
-            </tr>
-            <tr>
-              <th>最寄り駅</th>
-              <td>
-                <table className="station-table">
-                  <thead>
-                    <tr>
-                      <th>駅名</th>
-                      <th>徒歩</th>
-                      <th>バス</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[1, 2, 3, 4, 5].map((num) => {
-                      const station = bukken[`station${num}`];
-                      const walk = bukken[`station${num}_walk`];
-                      const bus = bukken[`station${num}_bus`];
 
-                      if (!station) return null;
+        {/* 📷 クリックでモーダル */}
+        {currentIndex !== null && (
+          <div className="modal-overlay" onClick={() => setCurrentIndex(null)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <img
+                src={toImageUrl(bukken.image_paths[currentIndex])}
+                alt="拡大画像"
+              />
+              <button className="close-btn" onClick={() => setCurrentIndex(null)}>
+                ×
+              </button>
+              <button className="nav-btn prev-btn" onClick={handlePrev}>
+                ‹
+              </button>
+              <button className="nav-btn next-btn" onClick={handleNext}>
+                ›
+              </button>
+            </div>
+          </div>
+        )}
 
+        {/* 📝 物件情報 */}
+        <div className="info-section">
+          <h4 className="section-title">物件情報</h4>
+          <button className="btn btn-warning mb-3" onClick={handleAddFavorite}>
+            ★ お気に入り追加
+          </button>
+          <table className="info-table">
+            <tbody>
+              <tr>
+                <th>所在地</th>
+                <td>
+                  {[
+                    bukken.large_area,
+                    bukken.small_area,
+                    bukken.address_town,
+                    bukken.address_chome,
+                    bukken.address_banchi,
+                    bukken.address_go,
+                    bukken.address_building,
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                </td>
+              </tr>
+              <tr>
+                <th>最寄り駅</th>
+                <td>
+                  <table className="station-table">
+                    <thead>
+                      <tr>
+                        <th>駅名</th>
+                        <th>徒歩</th>
+                        <th>バス</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[1, 2, 3, 4, 5].map((num) => {
+                        const station = bukken[`station${num}`];
+                        const walk = bukken[`station${num}_walk`];
+                        const bus = bukken[`station${num}_bus`];
+                        if (!station) return null;
+                        return (
+                          <tr key={num}>
+                            <td>{station}</td>
+                            <td>{walk ? `${walk}分` : "-"}</td>
+                            <td>{bus ? `${bus}分` : "-"}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <th>築年</th>
+                <td>{bukken.built_year}年</td>
+              </tr>
+              <tr>
+                <th>賃料</th>
+                <td>
+                  {bukken.rent} 円 {bukken.rent_negotiable ? "(応相談)" : ""}
+                </td>
+              </tr>
+              <tr>
+                <th>構造</th>
+                <td>{bukken.structure}</td>
+              </tr>
+              <tr>
+                <th>面積</th>
+                <td>
+                  {bukken.m2}㎡ / {bukken.tsubo}坪
+                </td>
+              </tr>
+              <tr>
+                <th>建物階数</th>
+                <td>
+                  地上 {bukken.stories_up} 階 / 地下 {bukken.stories_down} 階
+                </td>
+              </tr>
+              <tr>
+                <th>フロア区分</th>
+                <td>
+                  {bukken.floor_type}（{bukken.whole_building ? "一棟貸し" : "フロア貸し"}）
+                </td>
+              </tr>
+              <tr>
+                <th>契約期間</th>
+                <td>{bukken.contract_period}</td>
+              </tr>
+              <tr>
+                <th>敷金</th>
+                <td>
+                  {bukken.deposit_month
+                    ? `${bukken.deposit_month} ヶ月`
+                    : bukken.deposit_yen
+                    ? `${bukken.deposit_yen} 万円`
+                    : "-"}
+                  {bukken.deposit_neg ? "（応相談）" : ""}
+                </td>
+              </tr>
+              <tr>
+                <th>礼金</th>
+                <td>
+                  {bukken.key_money_month
+                    ? `${bukken.key_money_month} ヶ月`
+                    : bukken.key_money_yen
+                    ? `${bukken.key_money_yen} 万円`
+                    : "-"}
+                  {bukken.key_money_neg ? "（応相談）" : ""}
+                </td>
+              </tr>
+              <tr>
+                <th>更新料</th>
+                <td>{bukken.renewal_fee}</td>
+              </tr>
+              <tr>
+                <th>管理費</th>
+                <td>
+                  {bukken.maintenance} {bukken.maint_neg ? "(応相談)" : ""}
+                </td>
+              </tr>
+              <tr>
+                <th>造作譲渡料</th>
+                <td>
+                  {bukken.transfer_fee ? `${bukken.transfer_fee} 万円` : "-"}
+                  {bukken.transfer_neg ? "（応相談）" : ""}
+                </td>
+              </tr>
+              <tr>
+                <th>前テナント</th>
+                <td>{bukken.prev_tenant}</td>
+              </tr>
+              <tr>
+                <th>償却</th>
+                <td>{bukken.amortization}</td>
+              </tr>
+              <tr>
+                <th>出店可能な業態</th>
+                <td>
+                  <div className="industry-grid">
+                    {Object.entries(CATEGORY_DISPLAY_MAP).map(([key, label], idx) => {
+                      const isSelected = bukken.business_types?.[key];
                       return (
-                        <tr key={num}>
-                          <td>{station}</td>
-                          <td>{walk ? `${walk}分` : "-"}</td>
-                          <td>{bus ? `${bus}分` : "-"}</td>
-                        </tr>
+                        <div
+                          key={idx}
+                          className={`industry-item ${isSelected ? "selected" : ""}`}
+                        >
+                          {label}
+                        </div>
                       );
                     })}
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <th>築年</th>
-              <td>{bukken.built_year}年</td>
-            </tr>
-            <tr>
-              <th>賃料</th>
-              <td>{bukken.rent} 円 {bukken.rent_negotiable ? '(応相談)' : ''}</td>
-            </tr>
-            <tr>
-              <th>構造</th>
-              <td>{bukken.structure}</td>
-            </tr>
-            <tr>
-              <th>面積</th>
-              <td>{bukken.m2}㎡ / {bukken.tsubo}坪</td>
-            </tr>
-            <tr>
-              <th>建物階数</th>
-              <td>地上 {bukken.stories_up} 階 / 地下 {bukken.stories_down} 階</td>
-            </tr>
-            <tr>
-              <th>フロア区分</th>
-              <td>{bukken.floor_type}（{bukken.whole_building ? "一棟貸し" : "フロア貸し"}）</td>
-            </tr>
-            <tr>
-              <th>契約期間</th>
-              <td>{bukken.contract_period}</td>
-            </tr>
-            <tr>
-              <th>敷金</th>
-              <td>
-                {
-                  bukken.deposit_month 
-                    ? `${bukken.deposit_month} ヶ月` 
-                    : bukken.deposit_yen 
-                      ? `${bukken.deposit_yen} 万円` 
-                      : "-"
-                }
-                {bukken.deposit_neg ? "（応相談）" : ""}
-              </td>
-            </tr>
-            <tr>
-              <th>礼金</th>
-              <td>
-                {
-                  bukken.key_money_month 
-                    ? `${bukken.key_money_month} ヶ月` 
-                    : bukken.key_money_yen 
-                      ? `${bukken.key_money_yen} 万円` 
-                      : "-"
-                }
-                {bukken.key_money_neg ? "（応相談）" : ""}
-              </td>
-            </tr>
-            <tr>
-              <th>更新料</th>
-              <td>{bukken.renewal_fee}</td>
-            </tr>
-            <tr>
-              <th>管理費</th>
-              <td>{bukken.maintenance} {bukken.maint_neg ? "(応相談)" : ""}</td>
-            </tr>
-            <tr>
-              <th>造作譲渡料</th>
-              <td>
-                {
-                  bukken.transfer_fee
-                    ? `${bukken.transfer_fee} 万円`
-                    : "-"
-                }
-                {bukken.transfer_neg ? "（応相談）" : ""}
-              </td>
-            </tr>
-            <tr>
-              <th>前テナント</th>
-              <td>{bukken.prev_tenant}</td>
-            </tr>
-            <tr>
-              <th>償却</th>
-              <td>{bukken.amortization}</td>
-            </tr>
-            <tr>
-              <th>出店可能な業態</th>
-              <td>
-                <div className="industry-grid">
-                  {Object.entries(CATEGORY_DISPLAY_MAP).map(([key, label], idx) => {
-                    const isSelected = bukken.business_types?.[key];
-                    return (
-                      <div
-                        key={idx}
-                        className={`industry-item ${isSelected ? "selected" : ""}`}
-                      >
-                        {label}
-                      </div>
-                    );
-                  })}
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th>備考</th>
-              <td>{bukken.remarks}</td>
-            </tr>
-          </tbody>
-        </table>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <th>備考</th>
+                <td>{bukken.remarks}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="info-section">
+          <h4 className="section-title">仲介会社情報</h4>
+          <table className="info-table">
+            <tbody>
+              <tr>
+                <th>会社</th>
+                <td>{bukken.company}</td>
+              </tr>
+              <tr>
+                <th>担当者</th>
+                <td>{bukken.contact}</td>
+              </tr>
+              <tr>
+                <th>電話番号</th>
+                <td>{bukken.company_tel}</td>
+              </tr>
+              <tr>
+                <th>FAX番号</th>
+                <td>{bukken.company_fax}</td>
+              </tr>
+              <tr>
+                <th>コメント</th>
+                <td>{bukken.coment}</td>
+              </tr>
+              <tr>
+                <th>管理者メモ</th>
+                <td>{bukken.memo}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-  
-      <div className="info-section">
-        <h4 className="section-title">仲介会社情報</h4>
-        <table className="info-table">
-          <tbody>
-            <tr><th>会社</th><td>{bukken.company}</td></tr>
-            <tr><th>担当者</th><td>{bukken.contact}</td></tr>
-            <tr><th>電話番号</th><td>{bukken.company_tel}</td></tr>
-            <tr><th>FAX番号</th><td>{bukken.company_fax}</td></tr>
-            <tr><th>コメント</th><td>{bukken.coment}</td></tr>
-            <tr><th>管理者メモ</th><td>{bukken.memo}</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    </>
   );
-  
 }
 
 export default BukkenDetailPage;
